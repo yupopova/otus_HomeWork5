@@ -13,12 +13,11 @@ public class WaitTools {
 
     public WaitTools(WebDriver driver) {
         this.driver = driver;
-
     }
 
     public boolean waitForCondition(ExpectedCondition condition) {
         try {
-            new WebDriverWait(driver, 30);
+            new WebDriverWait(driver, Duration.ofSeconds(10)).until(condition);
             return true;
         } catch(TimeoutException ignore) {
             return false;

@@ -14,7 +14,7 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <selenium.java.version>3.141.59</selenium.java.version>
+        <selenium.java.version>4.16.1</selenium.java.version>
         <webdriver.manager.version>5.6.3</webdriver.manager.version>
         <junit.version>5.10.1</junit.version>
 

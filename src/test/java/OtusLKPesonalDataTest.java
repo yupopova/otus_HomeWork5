@@ -5,12 +5,10 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import tools.WaitTools;
-import java.util.List;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class OtusLKPesonalDataTest {
 
-    static Logger logger = LogManager.getLogger(OtusLKPesonalDataTest.class);
+    private Logger logger ;
     private WebDriver driver;
     private WaitTools waitTools;
 
@@ -21,6 +19,7 @@ public class OtusLKPesonalDataTest {
     @BeforeEach
     public void initDriver() {
         driver = new DriverFactory("--start-fullscrean").create();
+        logger = LogManager.getLogger(OtusLKPesonalDataTest.class);
         logger.info("Start driver and open browser");
         waitTools = new WaitTools(driver);
         driver.get(baseUrl);
@@ -39,13 +38,16 @@ public class OtusLKPesonalDataTest {
     private void auth() {
         String signInButtonLocator = "//button[text()='Войти']";
 
-        waitTools.waitForCondition(ExpectedConditions.presenceOfElementLocated(By.xpath(signInButtonLocator)));
-        waitTools.waitForCondition(ExpectedConditions.elementToBeClickable(By.xpath(signInButtonLocator)));
+        waitTools.waitForCondition(ExpectedConditions.and(
+                ExpectedConditions.presenceOfElementLocated((By.xpath(signInButtonLocator))),
+                ExpectedConditions.elementToBeClickable(By.xpath(signInButtonLocator))
+        ));
+
 
         WebElement signInButton = driver.findElement(By.xpath(signInButtonLocator));
 
         String signInPopupSelector = "#__PORTAL__ > div";
-        Assertions.assertTrue(waitTools.waitForCondition(ExpectedConditions.not(ExpectedConditions.presenceOfElementLocated(By.cssSelector(signInPopupSelector)))),
+        Assertions.assertTrue(waitTools.waitForCondition(ExpectedConditions.not(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(signInPopupSelector)))),
                 "Error! SignInPopup is opened");
 
         signInButton.click();
@@ -58,14 +60,16 @@ public class OtusLKPesonalDataTest {
         driver.findElement(By.xpath("//div[./input[@name='email']]")).click();
 
         WebElement emailInputField = driver.findElement(By.cssSelector("input[name='email']"));
-        waitTools.waitForCondition(ExpectedConditions.stalenessOf(emailInputField));
+        waitTools.waitForCondition(ExpectedConditions.visibilityOf(emailInputField));
+
+        //waitTools.waitForCondition(ExpectedConditions.stalenessOf(emailInputField));
         emailInputField.sendKeys(login);
         logger.info("Login entered");
 
         WebElement passwordInputField = driver.findElement(By.cssSelector("input[type='password']"));
 
         driver.findElement(By.xpath("//div[./input[@type='password']]")).click();
-        waitTools.waitForCondition(ExpectedConditions.stalenessOf(passwordInputField));
+        waitTools.waitForCondition(ExpectedConditions.visibilityOf(passwordInputField));
         passwordInputField.sendKeys(password);
         logger.info("Password entered");
 
@@ -78,11 +82,15 @@ public class OtusLKPesonalDataTest {
     }
 
     private void openMenuAboutMe() {
-        String openMenuAboutMeLocator = "//div/div[@class='sc-i28ik1-0 bmVffP sc-1youhxc-0 dwrtLP']";
+        String openMenuPersonalCabinetLocator = "//div[@class='sc-i28ik1-0 bmVffP sc-1youhxc-0 dwrtLP']";
+        //div[@data-name='user-info']
 
-        waitTools.waitForCondition(ExpectedConditions.presenceOfElementLocated(By.xpath(openMenuAboutMeLocator)));
-        waitTools.waitForCondition(ExpectedConditions.elementToBeClickable(By.xpath(openMenuAboutMeLocator)));
-        WebElement openMenuAboutMe = driver.findElement(By.xpath(openMenuAboutMeLocator));
+        waitTools.waitForCondition(ExpectedConditions.and(
+                ExpectedConditions.presenceOfElementLocated(By.xpath(openMenuPersonalCabinetLocator)),
+                ExpectedConditions.elementToBeClickable(By.xpath(openMenuPersonalCabinetLocator))
+        ));
+
+        WebElement openMenuAboutMe = driver.findElement(By.xpath(openMenuPersonalCabinetLocator));
         openMenuAboutMe.click();
         logger.info("User menu is open");
 
@@ -103,8 +111,7 @@ public class OtusLKPesonalDataTest {
     }
 
     @Test
-    @Order(1)
-    public void InputTest() {
+    public void inputTest() {
         auth();
         openMenuAboutMe();
         WebElement name = driver.findElement(By.id("id_fname"));
@@ -171,8 +178,7 @@ public class OtusLKPesonalDataTest {
     }
 
     @Test
-    @Order(2)
-    public void CheckTest() {
+    public void checkTest() {
         auth();
         openMenuAboutMe();
         Assertions.assertEquals("Тест", driver.findElement(By.id("id_fname")).getAttribute("value"));
