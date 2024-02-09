@@ -6,7 +6,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import tools.WaitTools;
 
-public class OtusLKPesonalDataTest {
+public class OtusPersonalDataTest {
 
     private Logger logger ;
     private WebDriver driver;
@@ -19,7 +19,7 @@ public class OtusLKPesonalDataTest {
     @BeforeEach
     public void initDriver() {
         driver = new DriverFactory("--start-fullscrean").create();
-        logger = LogManager.getLogger(OtusLKPesonalDataTest.class);
+        logger = LogManager.getLogger(OtusPersonalDataTest.class);
         logger.info("Start driver and open browser");
         waitTools = new WaitTools(driver);
         driver.get(baseUrl);
@@ -82,16 +82,15 @@ public class OtusLKPesonalDataTest {
     }
 
     private void openMenuAboutMe() {
-        String openMenuPersonalCabinetLocator = "//div[@class='sc-i28ik1-0 bmVffP sc-1youhxc-0 dwrtLP']";
-        //div[@data-name='user-info']
+        String openUserMenuLocator = "//div[@class='sc-i28ik1-0 bmVffP sc-1youhxc-0 dwrtLP']";
 
         waitTools.waitForCondition(ExpectedConditions.and(
-                ExpectedConditions.presenceOfElementLocated(By.xpath(openMenuPersonalCabinetLocator)),
-                ExpectedConditions.elementToBeClickable(By.xpath(openMenuPersonalCabinetLocator))
+                ExpectedConditions.presenceOfElementLocated(By.xpath(openUserMenuLocator)),
+                ExpectedConditions.elementToBeClickable(By.xpath(openUserMenuLocator))
         ));
 
-        WebElement openMenuAboutMe = driver.findElement(By.xpath(openMenuPersonalCabinetLocator));
-        openMenuAboutMe.click();
+        WebElement openUserMenu = driver.findElement(By.xpath(openUserMenuLocator));
+        openUserMenu.click();
         logger.info("User menu is open");
 
         driver.findElement(By.xpath("//div/a[@href='https://otus.ru/learning']")).click();
