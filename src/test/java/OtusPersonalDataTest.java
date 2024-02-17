@@ -62,7 +62,6 @@ public class OtusPersonalDataTest {
         WebElement emailInputField = driver.findElement(By.cssSelector("input[name='email']"));
         waitTools.waitForCondition(ExpectedConditions.visibilityOf(emailInputField));
 
-        //waitTools.waitForCondition(ExpectedConditions.stalenessOf(emailInputField));
         emailInputField.sendKeys(login);
         logger.info("Login entered");
 
@@ -93,10 +92,11 @@ public class OtusPersonalDataTest {
         openUserMenu.click();
         logger.info("User menu is open");
 
-        driver.findElement(By.xpath("//div/a[@href='https://otus.ru/learning']")).click();
+        driver.findElement(By.xpath("//*[contains(@href, 'learning')][.='Личный кабинет']")).click();
         logger.info("Personal cabinet is open");
 
-        String MenuAboutMe = "//div/a[@href='/lk/biography/personal/' and @title='О себе']";
+        String MenuAboutMe = "//*[contains(@href, 'personal')][contains(@title, 'О себе')]";
+
         waitTools.waitForCondition(ExpectedConditions.elementToBeClickable(By.xpath(MenuAboutMe)));
         driver.findElement(By.xpath(MenuAboutMe)).click();
         logger.info("Menu About Me is open");
@@ -143,25 +143,40 @@ public class OtusPersonalDataTest {
         birth.sendKeys("01.01.2000");
         logger.info("Date of birth entered");
 
-        driver.findElement(By.xpath("(//div[@class='input input_full lk-cv-block__input lk-cv-block__input_fake lk-cv-block__input_select-fake js-custom-select-presentation'])[1]")).click();
-        driver.findElement(By.xpath("//div/button[@title='Россия']")).click();
+        WebElement countrySelectElement = driver.findElement(By.cssSelector("[data-slave-selector='.js-lk-cv-dependent-slave-city']"));
+        countrySelectElement.click();
+        WebElement countryListContainer = countrySelectElement
+                .findElement(By.xpath(".//*[contains(@class, 'js-custom-select-options-container')]"));
+        waitTools.waitForCondition(ExpectedConditions.not(ExpectedConditions
+                .attributeContains(countryListContainer, "class", "hide")));
+        driver.findElement(By.cssSelector("[title='Россия']")).click();
+        waitTools.waitForCondition(ExpectedConditions
+                .attributeContains(countryListContainer, "class", "hide"));
         logger.info("Country entered");
-        try { Thread.sleep(2000); } catch (Exception ignored){}
-        driver.findElement(By.xpath("(//div[@class='input input_full lk-cv-block__input lk-cv-block__input_fake lk-cv-block__input_select-fake js-custom-select-presentation'])[2]")).click();
-        driver.findElement(By.xpath("//div/button[@title='Москва']")).click();
+
+        WebElement citySelectElement = driver.findElement(By.xpath("//*[contains(@class, 'js-lk-cv-dependent-slave-city')]"));
+        citySelectElement.click();
+
+        WebElement cityListContainer = citySelectElement
+                .findElement(By.xpath(".//*[contains(@class, 'js-custom-select-options-container')]"));
+        waitTools.waitForCondition(ExpectedConditions.not(ExpectedConditions
+                .attributeContains(cityListContainer, "class", "hide")));
+        driver.findElement(By.cssSelector("[title='Москва']")).click();
+        waitTools.waitForCondition(ExpectedConditions.attributeContains(cityListContainer, "class", "hide"));
         logger.info("City entered");
-        driver.findElement(By.xpath("(//div[@class='input input_full lk-cv-block__input lk-cv-block__input_fake lk-cv-block__input_select-fake js-custom-select-presentation'])[3]")).click();
-        driver.findElement(By.xpath("//div/button[@title='Продвинутый (Advanced)']")).click();
+
+        driver.findElement(By.xpath("//*[contains(@class, 'select lk-cv-block__input lk-cv-block__input_full js-lk-cv-custom-select')]")).click();
+        driver.findElement(By.cssSelector("[title='Продвинутый (Advanced)']")).click();
         logger.info("Level of English entered");
 
-        if (!driver.findElements(By.xpath("//div/span[.='Способ связи']")).isEmpty()) {
-            driver.findElement(By.xpath("//div/span[.='Способ связи']")).click();
-            driver.findElement(By.xpath("//div/button[@title='Тelegram']")).click();
+        if (!driver.findElements(By.xpath("//*[contains(@class, 'placeholder')][.='Способ связи']")).isEmpty()) {
+            driver.findElement(By.xpath("//*[contains(@class, 'placeholder')][.='Способ связи']")).click();
+            driver.findElement(By.xpath("//button[@title='Тelegram']")).click();
             driver.findElement(By.id("id_contact-0-value")).sendKeys("@Test_telegram");
             logger.info("Telegram entered");
-            driver.findElement(By.xpath("//div/button[.='Добавить']")).click();
-            driver.findElement(By.xpath("//div/span[.='Способ связи']")).click();
-            driver.findElement(By.xpath("(//div/button[@title='WhatsApp'])[2]")).click();
+            driver.findElement(By.xpath("//button[.='Добавить']")).click();
+            driver.findElement(By.xpath("//*[contains(@class, 'placeholder')][.='Способ связи']")).click();
+            driver.findElement(By.xpath("(//*[contains(@class, 'lk-cv-block__select-option_selected')][@title='WhatsApp']")).click();
             driver.findElement(By.id("id_contact-1-value")).sendKeys("+79998887766");
             logger.info("WhatsApp entered");
         } else {
@@ -171,13 +186,13 @@ public class OtusPersonalDataTest {
 
         Assertions.assertTrue(waitTools
                 .waitForCondition(ExpectedConditions
-                        .presenceOfElementLocated(By.xpath("(//span[@class='success'])[1]"))));
+                        .presenceOfElementLocated(By.xpath("//*[contains(@class, 'success')]"))));
         logger.info("Successful input");
 
     }
 
     @Test
-    public void checkTest() {
+    public void verifyTest() {
         auth();
         openMenuAboutMe();
         Assertions.assertEquals("Тест", driver.findElement(By.id("id_fname")).getAttribute("value"));
